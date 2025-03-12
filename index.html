@@ -1,145 +1,157 @@
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Sistema Completo de Facturación Electrónica</title> <!-- OCR con Tesseract.js -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
-    <!-- Librería para firma digital JWS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.24/jsrsasign-all-min.js"></script>
-    <link rel="stylesheet" href="css/index.css">
+  <meta charset="UTF-8">
+  <title>Sistema Completo de Facturación Electrónica</title>
+  <!-- Fuente moderna -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet">
+  <!-- OCR con Tesseract.js -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
+  <!-- Librería para firma digital JWS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.24/jsrsasign-all-min.js"></script>
+  <!-- Archivo CSS -->
+  <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-    <h1>Sistema Completo de Facturación Electrónica</h1>
-    <!-- 1. Captura de imagen y extracción OCR -->
-    <div class="section">
-        <h2>1. Captura de Factura y Extracción OCR</h2>
-        <input type="file" id="imageInput" accept="image/*" />
-        <button id="ocrBtn">Ejecutar OCR</button>
-        <h3>Texto Extraído:</h3>
-        <pre id="ocrText"></pre>
-    </div>
+  <div class="container">
+    <header>
+      <h1>Sistema Completo de Facturación Electrónica</h1>
+    </header>
 
-    <!-- 2. Formulario de Datos (para complementar y verificar la información) -->
-    <div class="section">
-        <h2>2. Ingreso y Verificación de Datos</h2>
-        <form id="dteForm">
-            <!-- Datos de la Factura -->
-            <fieldset>
-                <legend>Datos de la Factura</legend>
-                <label>Número de Factura:
-                    <input type="text" id="facturaNumero" placeholder="Ej. 12345" />
-                </label>
-                <label>Fecha (dd/mm/aaaa):
-                    <input type="text" id="facturaFecha" placeholder="Ej. 20/10/2022" />
-                </label>
-                <label>NIT Factura:
-                    <input type="text" id="facturaNIT" placeholder="Ej. 0614-290350-101-3" />
-                </label>
-                <label>Total:
-                    <input type="text" id="facturaTotal" placeholder="Ej. 1234.56" />
-                </label>
-            </fieldset>
-            <!-- Datos del Emisor -->
-            <fieldset>
-                <legend>Datos del Emisor</legend>
-                <label>NIT:
-                    <input type="text" id="emisorNIT" placeholder="Ej. 0614-290350-101-3" />
-                </label>
-                <label>NRC:
-                    <input type="text" id="emisorNRC" placeholder="NRC" />
-                </label>
-                <label>Nombre:
-                    <input type="text" id="emisorNombre" placeholder="Nombre del Emisor" />
-                </label>
-                <label>Código de Actividad:
-                    <input type="text" id="emisorCodActividad" value="62020" />
-                </label>
-                <label>Descripción de Actividad:
-                    <input type="text" id="emisorDescActividad" value="Actividad Comercial" />
-                </label>
-                <label>Nombre Comercial:
-                    <input type="text" id="emisorNombreComercial" placeholder="Nombre Comercial" />
-                </label>
-                <label>Tipo de Establecimiento:
-                    <input type="text" id="emisorTipoEstablecimiento" value="02" />
-                </label>
-                <label>Dirección (Departamento, Municipio, Complemento):
-                    <input type="text" id="emisorDepartamento" placeholder="Departamento" />
-                    <input type="text" id="emisorMunicipio" placeholder="Municipio" />
-                    <input type="text" id="emisorComplemento" placeholder="Complemento" />
-                </label>
-                <label>Teléfono:
-                    <input type="text" id="emisorTelefono" placeholder="Teléfono" />
-                </label>
-                <label>Correo:
-                    <input type="email" id="emisorCorreo" placeholder="Correo electrónico" />
-                </label>
-                <label>Código Estable MH:
-                    <input type="text" id="emisorCodEstableMH" value="4577" />
-                </label>
-                <label>Código Punto Venta MH:
-                    <input type="text" id="emisorCodPuntoVentaMH" value="4578" />
-                </label>
-            </fieldset>
-            <!-- Datos del Receptor -->
-            <fieldset>
-                <legend>Datos del Receptor</legend>
-                <label>NRC:
-                    <input type="text" id="receptorNRC" placeholder="NRC" />
-                </label>
-                <label>Nombre:
-                    <input type="text" id="receptorNombre" placeholder="Nombre del Receptor" />
-                </label>
-                <label>Código de Actividad:
-                    <input type="text" id="receptorCodActividad" value="00000" />
-                </label>
-                <label>Descripción de Actividad:
-                    <input type="text" id="receptorDescActividad" placeholder="Actividad del Receptor" />
-                </label>
-                <label>Dirección (Departamento, Municipio, Complemento):
-                    <input type="text" id="receptorDepartamento" placeholder="Departamento" />
-                    <input type="text" id="receptorMunicipio" placeholder="Municipio" />
-                    <input type="text" id="receptorComplemento" placeholder="Complemento" />
-                </label>
-                <label>Teléfono:
-                    <input type="text" id="receptorTelefono" placeholder="Teléfono" />
-                </label>
-                <label>Correo:
-                    <input type="email" id="receptorCorreo" placeholder="Correo electrónico" />
-                </label>
-                <label>Nombre Comercial:
-                    <input type="text" id="receptorNombreComercial" placeholder="Nombre Comercial" />
-                </label>
-                <label>NIT Receptor:
-                    <input type="text" id="receptorNIT" placeholder="NIT del Receptor" />
-                </label>
-            </fieldset>
-            <!-- Datos del Cuerpo del Documento (ítem) -->
-            <fieldset>
-                <legend>Datos del Ítem</legend>
-                <label>Descripción del Ítem:
-                    <input type="text" id="itemDescripcion" placeholder="Descripción del producto/servicio" />
-                </label>
-                <label>Cantidad:
-                    <input type="text" id="itemCantidad" value="1" />
-                </label>
-                <label>Precio Unitario:
-                    <input type="text" id="itemPrecioUni" placeholder="Precio unitario" />
-                </label>
-                <label>Descuento:
-                    <input type="text" id="itemDescuento" value="0.00" />
-                </label>
-            </fieldset>
-            <button type="button" id="generarDteBtn">Generar DTE Completo</button>
-        </form>
-    </div>
+    <!-- 1. Captura de imagen y extracción OCR -->
+    <section class="card">
+      <h2>1. Captura de Factura y Extracción OCR</h2>
+      <input type="file" id="imageInput" accept="image/*" />
+      <button id="ocrBtn">Ejecutar OCR</button>
+      <h3>Texto Extraído:</h3>
+      <pre id="ocrText"></pre>
+    </section>
+
+    <!-- 2. Formulario de Datos -->
+    <section class="card">
+      <h2>2. Ingreso y Verificación de Datos</h2>
+      <form id="dteForm">
+        <!-- Datos de la Factura -->
+        <fieldset>
+          <legend>Datos de la Factura</legend>
+          <label>Número de Factura:
+            <input type="text" id="facturaNumero" placeholder="Ej. 12345" />
+          </label>
+          <label>Fecha (dd/mm/aaaa):
+            <input type="text" id="facturaFecha" placeholder="Ej. 20/10/2022" />
+          </label>
+          <label>NIT Factura:
+            <input type="text" id="facturaNIT" placeholder="Ej. 0614-290350-101-3" />
+          </label>
+          <label>Total:
+            <input type="text" id="facturaTotal" placeholder="Ej. 1234.56" />
+          </label>
+        </fieldset>
+
+        <!-- Datos del Emisor -->
+        <fieldset>
+          <legend>Datos del Emisor</legend>
+          <label>NIT:
+            <input type="text" id="emisorNIT" placeholder="Ej. 0614-290350-101-3" />
+          </label>
+          <label>NRC:
+            <input type="text" id="emisorNRC" placeholder="NRC" />
+          </label>
+          <label>Nombre:
+            <input type="text" id="emisorNombre" placeholder="Nombre del Emisor" />
+          </label>
+          <label>Código de Actividad:
+            <input type="text" id="emisorCodActividad" value="62020" />
+          </label>
+          <label>Descripción de Actividad:
+            <input type="text" id="emisorDescActividad" value="Actividad Comercial" />
+          </label>
+          <label>Nombre Comercial:
+            <input type="text" id="emisorNombreComercial" placeholder="Nombre Comercial" />
+          </label>
+          <label>Tipo de Establecimiento:
+            <input type="text" id="emisorTipoEstablecimiento" value="02" />
+          </label>
+          <label>Dirección (Departamento, Municipio, Complemento):
+            <input type="text" id="emisorDepartamento" placeholder="Departamento" />
+            <input type="text" id="emisorMunicipio" placeholder="Municipio" />
+            <input type="text" id="emisorComplemento" placeholder="Complemento" />
+          </label>
+          <label>Teléfono:
+            <input type="text" id="emisorTelefono" placeholder="Teléfono" />
+          </label>
+          <label>Correo:
+            <input type="email" id="emisorCorreo" placeholder="Correo electrónico" />
+          </label>
+          <label>Código Estable MH:
+            <input type="text" id="emisorCodEstableMH" value="4577" />
+          </label>
+          <label>Código Punto Venta MH:
+            <input type="text" id="emisorCodPuntoVentaMH" value="4578" />
+          </label>
+        </fieldset>
+
+        <!-- Datos del Receptor -->
+        <fieldset>
+          <legend>Datos del Receptor</legend>
+          <label>NRC:
+            <input type="text" id="receptorNRC" placeholder="NRC" />
+          </label>
+          <label>Nombre:
+            <input type="text" id="receptorNombre" placeholder="Nombre del Receptor" />
+          </label>
+          <label>Código de Actividad:
+            <input type="text" id="receptorCodActividad" value="00000" />
+          </label>
+          <label>Descripción de Actividad:
+            <input type="text" id="receptorDescActividad" placeholder="Actividad del Receptor" />
+          </label>
+          <label>Dirección (Departamento, Municipio, Complemento):
+            <input type="text" id="receptorDepartamento" placeholder="Departamento" />
+            <input type="text" id="receptorMunicipio" placeholder="Municipio" />
+            <input type="text" id="receptorComplemento" placeholder="Complemento" />
+          </label>
+          <label>Teléfono:
+            <input type="text" id="receptorTelefono" placeholder="Teléfono" />
+          </label>
+          <label>Correo:
+            <input type="email" id="receptorCorreo" placeholder="Correo electrónico" />
+          </label>
+          <label>Nombre Comercial:
+            <input type="text" id="receptorNombreComercial" placeholder="Nombre Comercial" />
+          </label>
+          <label>NIT Receptor:
+            <input type="text" id="receptorNIT" placeholder="NIT del Receptor" />
+          </label>
+        </fieldset>
+
+        <!-- Datos del Ítem -->
+        <fieldset>
+          <legend>Datos del Ítem</legend>
+          <label>Descripción del Ítem:
+            <input type="text" id="itemDescripcion" placeholder="Descripción del producto/servicio" />
+          </label>
+          <label>Cantidad:
+            <input type="text" id="itemCantidad" value="1" />
+          </label>
+          <label>Precio Unitario:
+            <input type="text" id="itemPrecioUni" placeholder="Precio unitario" />
+          </label>
+          <label>Descuento:
+            <input type="text" id="itemDescuento" value="0.00" />
+          </label>
+        </fieldset>
+
+        <button type="button" id="generarDteBtn">Generar DTE Completo</button>
+      </form>
+    </section>
 
     <!-- 3. Mostrar el JSON final con la firma digital -->
-    <div class="section">
-        <h2>3. DTE JSON con Firma Digital</h2>
-        <pre id="dteJsonOutput"></pre>
-    </div>
-
-    <script src="js/index.js"></script>
+    <section class="card">
+      <h2>3. DTE JSON con Firma Digital</h2>
+      <pre id="dteJsonOutput"></pre>
+    </section>
+  </div>
+  <script src="js/index.js"></script>
 </body>
 </html>
