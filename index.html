@@ -3,14 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistema Completo de Facturación Electrónica</title>
-  <!-- OCR con Tesseract.js -->
+  <!-- Librerías externas -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
-  <!-- Librería para firma digital JWS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.24/jsrsasign-all-min.js"></script>
-  <!-- Fuente de Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Estilos CSS -->
   <link rel="stylesheet" href="css/index.css">
 </head>
 
@@ -33,85 +30,85 @@
       <!-- Datos de la Factura -->
       <fieldset>
         <legend>Datos de la Factura</legend>
-        <label>Número de Factura:
-          <input type="text" id="facturaNumero" />
-        </label>
-        <label>Fecha (dd/mm/aaaa):
-          <input type="text" id="facturaFecha" />
-        </label>
-        <label>NIT Factura:
-          <input type="text" id="facturaNIT" />
-        </label>
-        <label>Total:
-          <input type="text" id="facturaTotal" />
-        </label>
-        <label>Código de Generación:
-          <input type="text" id="facturaCodGen" />
-        </label>
-        <label>Número de Control:
-          <input type="text" id="facturaNumControl" />
-        </label>
-        <label>Sello de Recepción:
-          <input type="text" id="facturaSello" />
-        </label>
+        <label for="facturaNumero">Número de Factura</label>
+        <input type="text" id="facturaNumero" />
+
+        <label for="facturaFecha">Fecha (dd/mm/aaaa)</label>
+        <input type="text" id="facturaFecha" />
+
+        <label for="facturaNIT">NIT Factura</label>
+        <input type="text" id="facturaNIT" />
+
+        <label for="facturaTotal">Total</label>
+        <input type="text" id="facturaTotal" />
+
+        <label for="facturaCodGen">Código de Generación</label>
+        <input type="text" id="facturaCodGen" />
+
+        <label for="facturaNumControl">Número de Control</label>
+        <input type="text" id="facturaNumControl" />
+
+        <label for="facturaSello">Sello de Recepción</label>
+        <input type="text" id="facturaSello" />
       </fieldset>
+
       <!-- Datos del Emisor -->
       <fieldset>
         <legend>Datos del Emisor</legend>
-        <label>NIT:
-          <input type="text" id="emisorNIT" />
-        </label>
-        <label>NRC:
-          <input type="text" id="emisorNRC" />
-        </label>
-        <label>Nombre:
-          <input type="text" id="emisorNombre" />
-        </label>
-        <label>Dirección:
-          <input type="text" id="emisorDireccion" />
-        </label>
-        <label>Teléfono:
-          <input type="text" id="emisorTelefono" />
-        </label>
-        <label>Correo:
-          <input type="email" id="emisorCorreo" />
-        </label>
+        <label for="emisorNIT">NIT</label>
+        <input type="text" id="emisorNIT" />
+
+        <label for="emisorNRC">NRC</label>
+        <input type="text" id="emisorNRC" />
+
+        <label for="emisorNombre">Nombre</label>
+        <input type="text" id="emisorNombre" />
+
+        <label for="emisorDireccion">Dirección</label>
+        <input type="text" id="emisorDireccion" />
+
+        <label for="emisorTelefono">Teléfono</label>
+        <input type="text" id="emisorTelefono" />
+
+        <label for="emisorCorreo">Correo</label>
+        <input type="email" id="emisorCorreo" />
       </fieldset>
+
       <!-- Datos del Receptor -->
       <fieldset>
         <legend>Datos del Receptor</legend>
-        <label>Nombre:
-          <input type="text" id="receptorNombre" />
-        </label>
-        <label>NIT Receptor:
-          <input type="text" id="receptorNIT" />
-        </label>
-        <label>Teléfono:
-          <input type="text" id="receptorTelefono" />
-        </label>
-        <label>Correo:
-          <input type="email" id="receptorCorreo" />
-        </label>
+        <label for="receptorNombre">Nombre</label>
+        <input type="text" id="receptorNombre" />
+
+        <label for="receptorNIT">NIT Receptor</label>
+        <input type="text" id="receptorNIT" />
+
+        <label for="receptorTelefono">Teléfono</label>
+        <input type="text" id="receptorTelefono" />
+
+        <label for="receptorCorreo">Correo</label>
+        <input type="email" id="receptorCorreo" />
       </fieldset>
+
       <!-- Datos del Ítem -->
       <fieldset>
         <legend>Datos del Ítem</legend>
-        <label>Código:
-          <input type="text" id="itemCodigo" />
-        </label>
-        <label>Descripción:
-          <input type="text" id="itemDescripcion" />
-        </label>
-        <label>Cantidad:
-          <input type="text" id="itemCantidad" value="1.00" />
-        </label>
-        <label>Precio Unitario:
-          <input type="text" id="itemPrecioUni" />
-        </label>
-        <label>Descuento:
-          <input type="text" id="itemDescuento" value="0.00" />
-        </label>
+        <label for="itemCodigo">Código</label>
+        <input type="text" id="itemCodigo" />
+
+        <label for="itemDescripcion">Descripción</label>
+        <input type="text" id="itemDescripcion" />
+
+        <label for="itemCantidad">Cantidad</label>
+        <input type="text" id="itemCantidad" value="1.00" />
+
+        <label for="itemPrecioUni">Precio Unitario</label>
+        <input type="text" id="itemPrecioUni" />
+
+        <label for="itemDescuento">Descuento</label>
+        <input type="text" id="itemDescuento" value="0.00" />
       </fieldset>
+
       <button type="button" id="generarDteBtn">Generar DTE Completo</button>
     </form>
   </div>
