@@ -64,27 +64,35 @@ document.getElementById("preprocessBtn").addEventListener("click", function () {
 // Función para extraer datos clave usando expresiones regulares robustas
 function extraerDatosFactura(text) {
     var datos = {};
+
     // Número de factura
     var numMatch = text.match(/Factura\s*#?\s*(\d+)/i);
-    datos.numeroFactura = numMatch ? numMatch[1] : "";
-    // Fecha en formato ISO (ejemplo: 2025-03-11)
+    datos.numeroFactura = numMatch && numMatch[1] ? numMatch[1].trim() : "";
+
+    // Fecha en formato ISO
     var fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})/);
-    datos.fecha = fechaMatch ? fechaMatch[1] : "";
-    // NIT (se espera dígitos y guiones)
+    datos.fecha = fechaMatch && fechaMatch[1] ? fechaMatch[1].trim() : "";
+
+    // NIT
     var nitMatch = text.match(/NIT[:\s]*([\d\-]+)/i);
-    datos.nit = nitMatch ? nitMatch[1] : "";
-    // Total (sin el símbolo de dólar)
+    datos.nit = nitMatch && nitMatch[1] ? nitMatch[1].trim() : "";
+
+    // Total
     var totalMatch = text.match(/Total[:\s]*\$?([\d.,]+)/i);
-    datos.total = totalMatch ? totalMatch[1] : "";
+    datos.total = totalMatch && totalMatch[1] ? totalMatch[1].trim() : "";
+
     // Código de Generación
     var codGenMatch = text.match(/C[eé]digo\s+de\s+Generac[ií]on:\s*([\w\-\$]+)/i);
-    datos.codGeneracion = codGenMatch ? codGenMatch[1].replace("$", "8").trim() : generarUUID();
+    datos.codGeneracion = codGenMatch && codGenMatch[1] ? codGenMatch[1].replace("$", "8").trim() : generarUUID();
+
     // Número de Control
     var numControlMatch = text.match(/Numero\s+de\s+Control:\s*(\S+)/i);
-    datos.numControl = numControlMatch ? numControlMatch[1].trim() : generarNumeroControl();
-    // Sello de Recepción (captura parcial)
+    datos.numControl = numControlMatch && numControlMatch[1] ? numControlMatch[1].trim() : generarNumeroControl();
+
+    // Sello de Recepción
     var selloMatch = text.match(/Sello\s+de\s+Recepci[eé]n:\s*([\w\s]+)/i);
-    datos.sello = selloMatch ? selloMatch[1].trim() : "";
+    datos.sello = selloMatch && selloMatch[1] ? selloMatch[1].trim() : "";
+
     return datos;
 }
 
