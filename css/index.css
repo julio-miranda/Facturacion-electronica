@@ -32,3 +32,8 @@ pre {
     background: #f7f7f7;
     padding: 10px;
 }
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}

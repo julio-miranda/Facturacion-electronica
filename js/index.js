@@ -1,23 +1,29 @@
-// Función para preprocesar la imagen: convertir a escala de grises y aplicar umbral.
+// Función para preprocesar la imagen: se carga la imagen, se aplica filtro de contraste y se convierte a escala de grises con umbral.
 function preprocesarImagen(file, callback) {
     const canvas = document.getElementById("canvasPreview");
     const ctx = canvas.getContext("2d");
     const img = new Image();
     img.onload = function () {
-        // Ajustar tamaño de canvas
+        // Ajusta el tamaño del canvas a la imagen
         canvas.width = img.width;
         canvas.height = img.height;
+        // Si el navegador lo soporta, aplica filtro de contraste
+        if (ctx.filter !== undefined) {
+            ctx.filter = "contrast(150%) brightness(120%)";
+        }
         ctx.drawImage(img, 0, 0);
-        // Obtener datos de píxeles y convertir a escala de grises
+        // Obtener datos de píxeles y convertir a escala de grises con umbral
         let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         let data = imageData.data;
         for (let i = 0; i < data.length; i += 4) {
+            // Convertir a gris (promedio simple)
             let avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-            // Aplicar umbral
+            // Aplicar umbral: si el promedio es mayor a 128, poner en blanco; de lo contrario, negro
             let val = avg > 128 ? 255 : 0;
             data[i] = data[i + 1] = data[i + 2] = val;
         }
         ctx.putImageData(imageData, 0, 0);
+        // Convertir el canvas a blob y llamar al callback
         canvas.toBlob(callback, "image/png");
     };
     img.src = URL.createObjectURL(file);
@@ -25,7 +31,7 @@ function preprocesarImagen(file, callback) {
 
 // Ejecutar preprocesamiento y OCR
 document.getElementById("preprocessBtn").addEventListener("click", function () {
-    var file = document.getElementById("imageInput").files[0];
+    const file = document.getElementById("imageInput").files[0];
     if (!file) {
         alert("Seleccione una imagen de la factura.");
         return;
@@ -33,7 +39,6 @@ document.getElementById("preprocessBtn").addEventListener("click", function () {
     preprocesarImagen(file, function (blob) {
         Tesseract.recognize(blob, "spa", {
             logger: m => console.log(m),
-            // Configuración: limitar caracteres para mejorar la precisión
             config: {
                 tessedit_char_whitelist: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-:.$@, ",
                 tessedit_pageseg_mode: "3"
@@ -41,8 +46,8 @@ document.getElementById("preprocessBtn").addEventListener("click", function () {
         })
             .then(({ data: { text } }) => {
                 document.getElementById("ocrText").innerText = text;
-                var datos = extraerDatosFactura(text);
-                // Rellenar automáticamente campos del formulario
+                const datos = extraerDatosFactura(text);
+                // Rellenar automáticamente algunos campos del formulario
                 document.getElementById("facturaNumero").value = datos.numeroFactura || "";
                 document.getElementById("facturaFecha").value = datos.fecha || "";
                 document.getElementById("facturaNIT").value = datos.nit || "";
@@ -61,75 +66,68 @@ document.getElementById("preprocessBtn").addEventListener("click", function () {
     });
 });
 
-// Función para extraer datos clave usando expresiones regulares robustas
+// Función robusta para extraer datos usando expresiones regulares y validación
 function extraerDatosFactura(text) {
-    var datos = {};
-
-    // Número de factura
-    var numMatch = text.match(/Factura\s*#?\s*(\d+)/i);
+    const datos = {};
+    // Extraer número de factura
+    const numMatch = text.match(/Factura\s*#?\s*(\d+)/i);
     datos.numeroFactura = numMatch && numMatch[1] ? numMatch[1].trim() : "";
-
-    // Fecha en formato ISO
-    var fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})/);
+    // Extraer fecha en formato ISO (ejemplo: 2025-03-11)
+    const fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})/);
     datos.fecha = fechaMatch && fechaMatch[1] ? fechaMatch[1].trim() : "";
-
-    // NIT
-    var nitMatch = text.match(/NIT[:\s]*([\d\-]+)/i);
+    // Extraer NIT
+    const nitMatch = text.match(/NIT[:\s]*([\d\-]+)/i);
     datos.nit = nitMatch && nitMatch[1] ? nitMatch[1].trim() : "";
-
-    // Total
-    var totalMatch = text.match(/Total[:\s]*\$?([\d.,]+)/i);
+    // Extraer Total (sin símbolo de dólar)
+    const totalMatch = text.match(/Total[:\s]*\$?([\d.,]+)/i);
     datos.total = totalMatch && totalMatch[1] ? totalMatch[1].trim() : "";
-
-    // Código de Generación
-    var codGenMatch = text.match(/C[eé]digo\s+de\s+Generac[ií]on:\s*([\w\-\$]+)/i);
+    // Extraer Código de Generación (corrigiendo posible "$" erróneo)
+    const codGenMatch = text.match(/C[eé]digo\s+de\s+Generac[ií]on:\s*([\w\-\$]+)/i);
     datos.codGeneracion = codGenMatch && codGenMatch[1] ? codGenMatch[1].replace("$", "8").trim() : generarUUID();
-
-    // Número de Control
-    var numControlMatch = text.match(/Numero\s+de\s+Control:\s*(\S+)/i);
+    // Extraer Número de Control
+    const numControlMatch = text.match(/Numero\s+de\s+Control:\s*(\S+)/i);
     datos.numControl = numControlMatch && numControlMatch[1] ? numControlMatch[1].trim() : generarNumeroControl();
-
-    // Sello de Recepción
-    var selloMatch = text.match(/Sello\s+de\s+Recepci[eé]n:\s*([\w\s]+)/i);
+    // Extraer Sello de Recepción (parcial)
+    const selloMatch = text.match(/Sello\s+de\s+Recepci[eé]n:\s*([\w\s]+)/i);
     datos.sello = selloMatch && selloMatch[1] ? selloMatch[1].trim() : "";
-
     return datos;
 }
 
 // Función para generar un UUID (para Código de Generación)
 function generarUUID() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = (c === "x" ? r : (r & 0x3 | 0x8));
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === "x" ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     }).toUpperCase();
 }
 
-// Función para generar un Número de Control (simplificado)
+// Función para generar un Número de Control (ejemplo simplificado)
 function generarNumeroControl() {
     return "DTE-01-00000001-000000000000001";
 }
 
-// Función para calcular IVA (tasa 13%) con redondeo a 2 decimales
+// Función para calcular el IVA (13%) con redondeo a 2 decimales
 function calcularIVA(total) {
-    var num = parseFloat(total.replace(",", "."));
+    const num = parseFloat(total.replace(",", "."));
     if (isNaN(num)) return "0.00";
     return (num * 0.13).toFixed(2);
 }
 
 // Función para redondear valores de ítems a 8 decimales
 function redondearItem(valor) {
-    var num = parseFloat(valor.replace(",", "."));
+    const num = parseFloat(valor.replace(",", "."));
     if (isNaN(num)) return "0.00000000";
     return num.toFixed(8);
 }
 
 // Función para firmar digitalmente el JSON del DTE usando JWS
 function firmarDTE(jsonDTE) {
-    // Clave privada simulada (usar clave certificada en producción)
-    var clavePrivada = "-----BEGIN PRIVATE KEY-----\nMIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAMj...TUx\n-----END PRIVATE KEY-----";
-    var header = { alg: "RS256", typ: "JWT" };
-    var payload = JSON.stringify(jsonDTE);
-    var firma = KJUR.jws.JWS.sign("RS256", JSON.stringify(header), payload, clavePrivada);
+    // Clave privada simulada (en producción se utilizará una clave certificada y gestionada de forma segura)
+    const clavePrivada = "-----BEGIN PRIVATE KEY-----\nMIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAMj...TUx\n-----END PRIVATE KEY-----";
+    const header = { alg: "RS256", typ: "JWT" };
+    const payload = JSON.stringify(jsonDTE);
+    const firma = KJUR.jws.JWS.sign("RS256", JSON.stringify(header), payload, clavePrivada);
     return firma;
 }
 
@@ -139,19 +137,19 @@ function transmitirDTE(firmaDTE) {
     alert("DTE transmitido (simulación).");
 }
 
-// Generar el DTE completo y firmado
+// Generar el DTE completo y firmado al hacer clic en el botón
 document.getElementById("generarDteBtn").addEventListener("click", function () {
     // Recopilar datos de la factura
-    var facturaNumero = document.getElementById("facturaNumero").value;
-    var facturaFecha = document.getElementById("facturaFecha").value;
-    var facturaNIT = document.getElementById("facturaNIT").value;
-    var facturaTotal = document.getElementById("facturaTotal").value;
-    var facturaCodGen = document.getElementById("facturaCodGen").value;
-    var facturaNumControl = document.getElementById("facturaNumControl").value;
-    var facturaSello = document.getElementById("facturaSello").value;
+    const facturaNumero = document.getElementById("facturaNumero").value;
+    const facturaFecha = document.getElementById("facturaFecha").value;
+    const facturaNIT = document.getElementById("facturaNIT").value;
+    const facturaTotal = document.getElementById("facturaTotal").value;
+    const facturaCodGen = document.getElementById("facturaCodGen").value;
+    const facturaNumControl = document.getElementById("facturaNumControl").value;
+    const facturaSello = document.getElementById("facturaSello").value;
 
     // Datos del Emisor
-    var emisor = {
+    const emisor = {
         nit: document.getElementById("emisorNIT").value || facturaNIT,
         nrc: document.getElementById("emisorNRC").value || "",
         nombre: document.getElementById("emisorNombre").value || "Portillo Materiales Eléctricos, S.A. de C.V.",
@@ -161,7 +159,7 @@ document.getElementById("generarDteBtn").addEventListener("click", function () {
     };
 
     // Datos del Receptor
-    var receptor = {
+    const receptor = {
         nombre: document.getElementById("receptorNombre").value || "CLIENTES VARIOS",
         nit: document.getElementById("receptorNIT").value || "",
         telefono: document.getElementById("receptorTelefono").value || "26608300",
@@ -169,7 +167,7 @@ document.getElementById("generarDteBtn").addEventListener("click", function () {
     };
 
     // Datos del Ítem
-    var item = {
+    const item = {
         numItem: 1,
         tipItem: 2,
         cantidad: redondearItem(document.getElementById("itemCantidad").value),
@@ -188,11 +186,11 @@ document.getElementById("generarDteBtn").addEventListener("click", function () {
     };
 
     // Construcción del DTE
-    var dte = {
+    const dte = {
         identificacion: {
             version: 3,
-            ambiente: "01",
-            tipoDte: "03",
+            ambiente: "01", // Ejemplo: 01 para producción, 00 para prueba
+            tipoDte: "03", // Factura Electrónica
             numeroControl: facturaNumControl || generarNumeroControl(),
             codigoGeneracion: facturaCodGen || generarUUID(),
             tipoModelo: 1,
@@ -224,7 +222,7 @@ document.getElementById("generarDteBtn").addEventListener("click", function () {
             montoTotalOperacion: facturaTotal,
             totalNoGravado: "0.00",
             totalPagar: facturaTotal,
-            totalletras: "Monto en letras", // Se puede implementar conversión numérica a texto
+            totalletras: "Monto en letras", // Aquí se podría implementar la conversión a letras
             saldofavor: "0.00",
             condicionOperacion: 1,
             pagos: null,
@@ -243,12 +241,12 @@ document.getElementById("generarDteBtn").addEventListener("click", function () {
     };
 
     // Firmar digitalmente el DTE
-    var firma = firmarDTE(dte);
+    const firma = firmarDTE(dte);
     dte.firmaDigital = firma;
 
-    // Mostrar el DTE final con firma
+    // Mostrar el DTE final con firma en formato JSON
     document.getElementById("dteJsonOutput").innerText = JSON.stringify(dte, null, 2);
 
-    // Simular transmisión a la plataforma tributaria
+    // Simular la transmisión del DTE a la plataforma tributaria
     transmitirDTE(firma);
 });

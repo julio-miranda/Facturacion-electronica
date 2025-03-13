@@ -3,29 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <title>Sistema Mejorado de Facturación Electrónica</title>
-  <!-- OCR con Tesseract.js -->
+  <!-- Tesseract.js para OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
-  <!-- Librería para firma digital JWS -->
+  <!-- jsrsasign para firma digital simulada (JWS) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.24/jsrsasign-all-min.js"></script>
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
   <h1>Sistema Mejorado de Facturación Electrónica</h1>
   
-  <!-- 1. Carga y Preprocesamiento de la Imagen -->
+  <!-- 1. Carga, preprocesamiento de la imagen y OCR -->
   <div class="section">
     <h2>1. Cargar Factura y Preprocesar Imagen</h2>
     <input type="file" id="imageInput" accept="image/*" />
     <button id="preprocessBtn">Preprocesar y Ejecutar OCR</button>
-    <h3>Imagen Preprocesada (vista previa):</h3>
+    <h3>Vista previa de la imagen preprocesada:</h3>
     <canvas id="canvasPreview" style="border:1px solid #ccc;"></canvas>
     <h3>Texto Extraído:</h3>
     <pre id="ocrText"></pre>
   </div>
   
-  <!-- 2. Formulario para Verificar y Completar Datos -->
+  <!-- 2. Formulario para verificación y complemento de datos -->
   <div class="section">
-    <h2>2. Verificación y Complementación de Datos</h2>
+    <h2>2. Verificar y Completar Datos</h2>
     <form id="dteForm">
       <fieldset>
         <legend>Datos de la Factura</legend>
@@ -33,13 +33,13 @@
           <input type="text" id="facturaNumero" placeholder="Ej. 12345" />
         </label>
         <label>Fecha (dd/mm/aaaa):
-          <input type="text" id="facturaFecha" placeholder="Ej. 20/10/2022" />
+          <input type="text" id="facturaFecha" placeholder="Ej. 2025-03-11" />
         </label>
         <label>NIT Factura:
           <input type="text" id="facturaNIT" placeholder="Ej. 0614-290350-101-3" />
         </label>
         <label>Total:
-          <input type="text" id="facturaTotal" placeholder="Ej. 1234.56" />
+          <input type="text" id="facturaTotal" placeholder="Ej. 4.94" />
         </label>
         <label>Código de Generación:
           <input type="text" id="facturaCodGen" placeholder="Extraído del OCR" />
@@ -109,7 +109,7 @@
     </form>
   </div>
   
-  <!-- 3. Visualización del JSON del DTE con Firma Digital -->
+  <!-- 3. Mostrar el JSON del DTE con Firma Digital -->
   <div class="section">
     <h2>3. DTE JSON con Firma Digital</h2>
     <pre id="dteJsonOutput"></pre>
