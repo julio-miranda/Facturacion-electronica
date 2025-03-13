@@ -1,11 +1,27 @@
-document.getElementById("ocrBtn").addEventListener("click", function () {
+document.getElementById("ocrBtn").addEventListener("click", function () { 
     var file = document.getElementById("imageInput").files[0];
     if (!file) {
         alert("Seleccione una imagen.");
         return;
     }
+
+    // Mostrar la pantalla de carga
+    document.getElementById("loadingOverlay").style.display = "flex";
+
+    // Deshabilitar el botón y el input
+    document.getElementById("ocrBtn").disabled = true;
+    document.getElementById("imageInput").disabled = true;
+
+    // Ejecutar OCR
     Tesseract.recognize(file, "spa", { logger: m => console.log(m) })
         .then(({ data: { text } }) => {
+            // Ocultar la pantalla de carga
+            document.getElementById("loadingOverlay").style.display = "none";
+
+            // Habilitar nuevamente el botón y el input
+            document.getElementById("ocrBtn").disabled = false;
+            document.getElementById("imageInput").disabled = false;
+
             document.getElementById("ocrText").innerText = text;
             var datos = extraerDatos(text);
             document.getElementById("facturaNumero").value = datos.numero || "";
@@ -17,6 +33,13 @@ document.getElementById("ocrBtn").addEventListener("click", function () {
             document.getElementById("facturaSello").value = datos.sello || "";
         })
         .catch(err => {
+            // Ocultar la pantalla de carga en caso de error
+            document.getElementById("loadingOverlay").style.display = "none";
+
+            // Habilitar nuevamente el botón y el input
+            document.getElementById("ocrBtn").disabled = false;
+            document.getElementById("imageInput").disabled = false;
+
             console.error("Error en OCR:", err);
             alert("Error al ejecutar OCR.");
         });
